@@ -65,8 +65,8 @@ Each output contains a `generation` list:
 Generated continuations can optionally be rendered with the prompt for inspection:
 
 ```bash
-python script/preview.py \
-  --prompt examples/input.json \
+python scripts/preview.py \
+  --prompt examples/prompt_01.json \
   --generated outputs/sample_01.json \
   --output comparison.mid
 ```

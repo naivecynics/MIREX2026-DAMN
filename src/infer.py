@@ -147,6 +147,7 @@ def sample_token(
     top_p: float,
     top_k: int,
     min_token: int = 0,
+    max_token: int | None = None,
 ) -> int:
     if logits.ndim != 1:
         raise ValueError("logits must be one-dimensional")
@@ -159,6 +160,8 @@ def sample_token(
 
     scores = logits.float().clone()
     scores[:min_token] = -torch.inf
+    if max_token is not None:
+        scores[max_token + 1 :] = -torch.inf
     if not torch.isfinite(scores).any():
         raise RuntimeError("sampling constraints removed every token")
     if temperature == 0:
@@ -200,6 +203,7 @@ def generate_continuation(
     top_k: int = 0,
     max_notes: int = 512,
     max_notes_per_onset: int = 32,
+    min_generation_end: int = 240,
     autocast_context: Callable[[], ContextManager[object]] = nullcontext,
 ) -> list[dict[str, int]]:
     if max_notes < 1:
@@ -209,6 +213,7 @@ def generate_continuation(
     prompt = normalize_notes(prompt, prompt=True)
     history = list(prompt)
     generated: list[dict[str, int]] = []
+    generated_end = PROMPT_END
     last_start = history[-1]["start"] if history else 0
     current_onset_count = sum(
         note["start"] == last_start for note in history
@@ -243,7 +248,21 @@ def generate_continuation(
             top_k=top_k,
             min_token=min_delta,
         )
-        if config.eos_token_id is not None and start == config.eos_token_id:
+        eos = config.eos_token_id
+        ends_early = eos is not None and start == eos
+        if start <= TOKEN_MAX:
+            ends_early = ends_early or last_start + start >= PIECE_END
+        if generated_end < min_generation_end and ends_early:
+            start = sample_token(
+                start_logits,
+                generator=generator,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                min_token=min_delta,
+                max_token=min(TOKEN_MAX, PIECE_END - last_start - 1),
+            )
+        if eos is not None and start == eos:
             break
         next_start = last_start + start
         if next_start >= PIECE_END:
@@ -299,6 +318,7 @@ def generate_continuation(
             "duration": duration,
         }
         generated.append(note)
+        generated_end = max(generated_end, next_start + duration)
         history.append(note)
         if next_start == last_start:
             current_onset_count += 1
@@ -336,6 +356,7 @@ def run_inference(
     top_k: int,
     max_notes: int,
     max_notes_per_onset: int,
+    min_generation_end: int = 240,
 ) -> list[Path]:
     if n_samples < 1:
         raise ValueError("n_samples must be positive")
@@ -356,6 +377,7 @@ def run_inference(
             top_k=top_k,
             max_notes=max_notes,
             max_notes_per_onset=max_notes_per_onset,
+            min_generation_end=min_generation_end,
             autocast_context=accelerator.autocast,
         )
         output_path = output_dir / f"sample_{index + 1:02d}.json"
@@ -377,6 +399,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--top-k", type=int, default=0)
     parser.add_argument("--max-notes", type=int, default=512)
     parser.add_argument("--max-notes-per-onset", type=int, default=32)
+    parser.add_argument("--min-generation-end", type=int, default=240)
     return parser.parse_args(argv)
 
 
@@ -393,6 +416,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         top_k=args.top_k,
         max_notes=args.max_notes,
         max_notes_per_onset=args.max_notes_per_onset,
+        min_generation_end=args.min_generation_end,
     )
     return 0
 

@@ -19,6 +19,7 @@ fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODEL_DIR="${DAMN_MODEL_DIR:-${ROOT}/model}"
+export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
 
 for FILE in model.safetensors config.json; do
     hf download "${REPO_ID}" "${FILE}" \

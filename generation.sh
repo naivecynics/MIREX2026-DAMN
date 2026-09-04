@@ -27,5 +27,6 @@ echo "Generating $3 sample(s)..."
     --top-p 0.95 \
     --top-k 0 \
     --max-notes 512 \
-    --max-notes-per-onset 32
+    --max-notes-per-onset 32 \
+    --min-generation-end 240
 echo "Done: $2"
