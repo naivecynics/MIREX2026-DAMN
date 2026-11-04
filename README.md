@@ -1,8 +1,12 @@
 # DAMN
 
-**Delta-Absolute Modeling with Nested Transformers** for symbolic piano continuation, submitted to MIREX 2026. Given a four-bar piano prompt with an optional pickup, DAMN generates a twelve-bar continuation.
+[![Code](https://img.shields.io/badge/Code-GitHub-181717?style=flat-square&logo=github)](https://github.com/naivecynics/MIREX2026-DAMN)
+[![Models](https://img.shields.io/badge/Models-Hugging%20Face-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/naivecynics/MIREX2026-DAMN)
+[![Dataset](https://img.shields.io/badge/Dataset-MetaScore--SFT--100-2563EB?style=flat-square&logo=huggingface&logoColor=white)](https://huggingface.co/datasets/naivecynics/MetaScore-SFT-100)
+[![Results](https://img.shields.io/badge/MIREX%202026-Results-7C3AED?style=flat-square)](https://music-ir.org/mirex/wiki/2026:Symbolic_Music_Generation_Results)
+[![Demo](https://img.shields.io/badge/Demo-Listen-16A34A?style=flat-square)](https://futuremirex.com/demos/symbolic-music-generation-2026/)
 
-[Code](https://github.com/naivecynics/MIREX2026-DAMN) · [Weights](https://huggingface.co/naivecynics/MIREX2026-DAMN) · [Benchmark](https://huggingface.co/datasets/naivecynics/MetaScore-SFT-100) · [Results](https://music-ir.org/mirex/wiki/2026:Symbolic_Music_Generation_Results) · [Demo](https://futuremirex.com/demos/symbolic-music-generation-2026/)
+**Delta-Absolute Modeling with Nested Transformers** for symbolic piano continuation, submitted to MIREX 2026. Given a four-bar piano prompt with an optional pickup, DAMN generates a twelve-bar continuation.
 
 ## MIREX 2026 results
 
