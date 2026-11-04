@@ -3,3 +3,10 @@ __pycache__/
 .venv/
 model/
 outputs/
+data/
+checkpoints/
+logs/
+wandb/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
